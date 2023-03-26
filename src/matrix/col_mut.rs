@@ -13,9 +13,11 @@ pub struct ColMut<'a, T> {
 }
 
 impl<'a, T> ColMut<'a, T> {
-    pub fn get(&mut self, index: usize) -> Option<&mut T> {
-        let pos = index * self.matrix.col + self.col;
-        self.matrix.data.get_mut(pos)
+    pub fn get(&mut self, index: usize) -> Option<&'a mut T> {
+        // SAFETY: 'self >= &'a，且 element 是对 matrix.data 的引用，而非 row 的引用。
+        let mut row = self.matrix.row_mut(index)?;
+        let element = row.get(self.col);
+        unsafe { transmute(element) }
     }
 }
 
