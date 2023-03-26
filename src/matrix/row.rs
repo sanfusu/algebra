@@ -1,5 +1,7 @@
 use std::ops::Index;
 
+use crate::vector::RowVec;
+
 use super::Matrix;
 
 pub struct Row<'a, T> {
@@ -22,8 +24,10 @@ impl<'a, T> Row<'a, T>
 where
     T: Clone,
 {
-    pub fn to_vec(&self) -> Vec<T> {
-        self.as_slice().to_owned()
+    pub fn to_vec(&self) -> RowVec<T> {
+        RowVec {
+            data: self.as_slice().to_owned(),
+        }
     }
 }
 

@@ -1,3 +1,5 @@
+use crate::vector::ColVec;
+
 use super::Matrix;
 
 pub struct Col<'a, T> {
@@ -21,8 +23,10 @@ impl<'a, T> Col<'a, T>
 where
     T: Clone,
 {
-    pub fn to_vec(self) -> Vec<T> {
-        self.into_iter().collect()
+    pub fn to_vec(self) -> ColVec<T> {
+        ColVec {
+            data: self.into_iter().collect(),
+        }
     }
 }
 

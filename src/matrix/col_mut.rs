@@ -3,6 +3,8 @@ use std::{
     ops::{Index, IndexMut},
 };
 
+use crate::vector::ColVec;
+
 use super::{col::Col, Matrix};
 
 pub struct ColMut<'a, T> {
@@ -18,7 +20,7 @@ impl<'a, T> ColMut<'a, T> {
 }
 
 impl<'a, T: Clone> ColMut<'a, T> {
-    pub fn to_vec(self) -> Vec<T> {
+    pub fn to_vec(self) -> ColVec<T> {
         let col: Col<T> = self.into();
         col.to_vec()
     }
