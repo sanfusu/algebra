@@ -112,8 +112,6 @@ impl<T> IndexMut<usize> for Matrix<T> {
 
 #[cfg(test)]
 mod test {
-    use std::ops::IndexMut;
-
     use super::Matrix;
     fn create_matrix() -> Matrix<u8> {
         Matrix::new(vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9])

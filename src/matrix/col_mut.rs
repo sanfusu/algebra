@@ -1,7 +1,6 @@
 use std::{
-    marker::PhantomData,
+    mem::transmute,
     ops::{Index, IndexMut},
-    ptr::NonNull,
 };
 
 use super::{col::Col, Matrix};
@@ -36,39 +35,33 @@ impl<'a, T> Into<Col<'a, T>> for ColMut<'a, T> {
 impl<'a: 'b, 'b, T> IntoIterator for &'b mut ColMut<'a, T> {
     type Item = &'a mut T;
 
-    type IntoIter = ColEleIterMut<'a, T>;
+    type IntoIter = ColEleIterMut<'a, 'b, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        ColEleIterMut {
-            col: self.matrix.col,
-            idx: 0,
-            data: unsafe { NonNull::new_unchecked(self.matrix.data.as_mut_ptr()) },
-            row: self.matrix.row,
-            phantom: PhantomData,
+        // SAFETY: 'self >= ('a,'b)，因此可以安全的转换
+        unsafe {
+            transmute::<ColEleIterMut<'a, '_, T>, ColEleIterMut<'a, 'b, T>>(ColEleIterMut {
+                col: self,
+                idx: 0,
+            })
         }
     }
 }
 
-pub struct ColEleIterMut<'a, T> {
-    data: NonNull<T>,
-    row: usize,
-    col: usize,
+pub struct ColEleIterMut<'a: 'b, 'b, T> {
+    col: &'b mut ColMut<'a, T>,
     idx: usize,
-    phantom: PhantomData<&'a mut T>,
 }
-impl<'a, T> Iterator for ColEleIterMut<'a, T> {
+impl<'a, 'b, T> Iterator for ColEleIterMut<'a, 'b, T> {
     type Item = &'a mut T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        // SAFETY: 实际引用的数据是 matrix，所以这里 transmute 不会造成对临时变量应用的泄露。
-        if self.idx >= self.row {
-            None
-        } else {
-            let pos = self.idx * self.col + self.col;
-            let result = unsafe { self.data.as_ptr().offset(pos as isize).as_mut() };
-            self.idx += 1;
-            result
-        }
+        // SAFETY: self.col.get 返回的生命周期为 'self，但是需要的是 'a
+        // 由于 'self >= 'a，所以转换是安全的
+        let src = self.col.get(self.idx);
+        let dst = unsafe { transmute::<Option<&'_ mut T>, Option<&'a mut T>>(src) }?;
+        self.idx += 1;
+        Some(dst)
     }
 }
 
