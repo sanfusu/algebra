@@ -6,22 +6,7 @@ use std::{
 
 use crate::vector::ColVec;
 
-use super::{col::Col, Matrix, RawMatrix};
-
-pub struct RawColMut<'a, T> {
-    matrix: RawMatrix<'a, T>,
-    col: usize,
-}
-
-impl<'a, T> RawColMut<'a, T> {
-    pub fn flat_idx(&self, idx: usize) -> Option<usize> {
-        if idx < self.matrix.row {
-            Some(idx * self.matrix.col + self.col)
-        } else {
-            None
-        }
-    }
-}
+use super::{col::Col, raw::RawColMut, Matrix};
 
 pub struct ColMut<'a, T> {
     pub(crate) matrix: &'a mut Matrix<T>,
@@ -29,7 +14,7 @@ pub struct ColMut<'a, T> {
 }
 
 impl<'a, T> ColMut<'a, T> {
-    pub fn as_raw(&mut self) -> RawColMut<T> {
+    pub(crate) fn as_raw(&mut self) -> RawColMut<T> {
         RawColMut {
             matrix: self.matrix.as_raw(),
             col: self.col,

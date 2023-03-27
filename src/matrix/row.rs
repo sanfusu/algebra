@@ -8,7 +8,7 @@ pub struct Row<'a, T> {
     pub(crate) matrix: &'a Matrix<T>,
     pub(crate) row: usize,
 }
-impl<'a:'b, 'b, T> Row<'a, T> {
+impl<'a: 'b, 'b, T> Row<'a, T> {
     pub fn as_slice(&'b self) -> &'a [T] {
         &self.matrix[self.row]
     }

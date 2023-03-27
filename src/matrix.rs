@@ -1,6 +1,7 @@
 use self::{
     col::{Col, ColMatrix},
     col_mut::ColMut,
+    raw::RawMatrix,
     row::{Row, RowMatrix},
     row_mut::RowMut,
 };
@@ -14,17 +15,11 @@ use std::{
 pub mod col;
 pub mod col_mut;
 pub mod ops;
+pub(crate) mod raw;
 pub mod row;
 pub mod row_mut;
 #[derive(Debug)]
 pub struct MatrixRearrangeFailed;
-
-pub struct RawMatrix<'a, T> {
-    pub data: NonNull<T>,
-    pub col: usize,
-    pub row: usize,
-    phantom: PhantomData<&'a mut T>,
-}
 
 #[derive(Clone, Debug)]
 pub struct Matrix<T> {
@@ -33,7 +28,7 @@ pub struct Matrix<T> {
     pub row: usize,
 }
 impl<T> Matrix<T> {
-    pub fn as_raw(&mut self) -> RawMatrix<T> {
+    pub(crate) fn as_raw(&mut self) -> RawMatrix<T> {
         RawMatrix {
             data: unsafe { NonNull::new_unchecked(self.data.as_mut_ptr()) },
             col: self.col,
