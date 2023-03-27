@@ -5,7 +5,9 @@ use self::{
     row_mut::RowMut,
 };
 use std::{
+    marker::PhantomData,
     ops::{Index, IndexMut},
+    ptr::NonNull,
     usize,
 };
 
@@ -17,6 +19,13 @@ pub mod row_mut;
 #[derive(Debug)]
 pub struct MatrixRearrangeFailed;
 
+pub struct RawMatrix<'a, T> {
+    pub data: NonNull<T>,
+    pub col: usize,
+    pub row: usize,
+    phantom: PhantomData<&'a mut T>,
+}
+
 #[derive(Clone, Debug)]
 pub struct Matrix<T> {
     data: Vec<T>,
@@ -24,6 +33,14 @@ pub struct Matrix<T> {
     pub row: usize,
 }
 impl<T> Matrix<T> {
+    pub fn as_raw(&mut self) -> RawMatrix<T> {
+        RawMatrix {
+            data: unsafe { NonNull::new_unchecked(self.data.as_mut_ptr()) },
+            col: self.col,
+            row: self.row,
+            phantom: PhantomData,
+        }
+    }
     pub fn new(data: Vec<T>) -> Self {
         Self {
             col: data.len(),
@@ -166,15 +183,14 @@ mod test {
             *ele *= 2;
         }
         println!("{:?}", m3x3.data);
-        {
-            let mut col = m3x3.col_mut(2).unwrap();
-            {
-                for ele in &mut col {
-                    *ele *= 2;
-                }
-            };
-            col[0] = 1;
-        }
+        let mut col = m3x3.col_mut(2).unwrap();
+
+        col.iter_mut().for_each(|ele| {
+            *ele *= 2;
+        });
+        col[0] = 1;
+        col[1] = 1;
+
         m3x3.col_mut(0).unwrap()[0] = 1;
         println!("{:?}", m3x3);
     }

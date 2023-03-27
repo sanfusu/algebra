@@ -1,6 +1,10 @@
-use std::ops::Add;
+use std::ops::{Add, Mul};
 
-use super::Matrix;
+use super::{
+    col::{Col, IntoColEleIter},
+    row::{Row, IntoRowEleIter},
+    Matrix,
+};
 
 impl<T> Add for Matrix<T>
 where
@@ -44,9 +48,28 @@ impl<T: Copy> Matrix<T> {
             (self.col, self.row) = (self.row, self.col);
         }
         for r in 0..self.row {
-            for j in (r+1)..self.col {
+            for j in (r + 1)..self.col {
                 (self[r][j], self[j][r]) = (self[j][r], self[r][j])
             }
         }
+    }
+}
+
+impl<'a, T> Mul<Col<'a, T>> for Row<'a, T>
+where
+    T: Default,
+    T: Clone,
+    T: Mul<T, Output = T>,
+    T: Add<T, Output = T>,
+{
+    type Output = T;
+
+    fn mul(self, rhs: Col<'a, T>) -> Self::Output {
+        let row_ele_iter: IntoRowEleIter<T> = self.into_iter();
+        let other: IntoColEleIter<T> = rhs.into_iter();
+        row_ele_iter.zip(other).fold(T::default(), |sum, (x, y)| {
+            let diff = x * y;
+            sum + diff
+        })
     }
 }
