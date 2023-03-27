@@ -1,7 +1,7 @@
 use self::{
-    col::{Col, Cols},
+    col::{Col, ColMatrix},
     col_mut::ColMut,
-    row::{Row, Rows},
+    row::{Row, RowMatrix},
     row_mut::RowMut,
 };
 use std::{
@@ -38,8 +38,8 @@ impl<T> Matrix<T> {
             Ok(Self { col, row, ..self })
         }
     }
-    pub fn rows(&self) -> Rows<T> {
-        Rows {
+    pub fn as_rowmatrix(&self) -> RowMatrix<T> {
+        RowMatrix {
             matrix: self,
             idx: 0,
         }
@@ -54,7 +54,7 @@ impl<T> Matrix<T> {
             })
         }
     }
-    pub fn row_mut(&mut self, index: usize) -> Option<RowMut<T>> {
+    pub fn row_mut<'a>(&'a mut self, index: usize) -> Option<RowMut<'a, T>> {
         if index >= self.row {
             None
         } else {
@@ -84,8 +84,8 @@ impl<T> Matrix<T> {
             })
         }
     }
-    pub fn cols(&self) -> Cols<T> {
-        Cols {
+    pub fn as_colmatrix(&self) -> ColMatrix<T> {
+        ColMatrix {
             matrix: self,
             idx: 0,
         }
@@ -120,11 +120,11 @@ mod test {
     fn matrix_rearrange_test() {
         let matrix = create_matrix();
         let m2x5 = matrix.rearrange(2, 5).unwrap();
-        for row in m2x5.rows() {
+        for row in m2x5.as_rowmatrix() {
             println!("{:?}", row.as_slice());
         }
         let m5x2 = m2x5.rearrange(5, 2).unwrap();
-        for row in m5x2.rows() {
+        for row in m5x2.as_rowmatrix() {
             println!("{:?}", row.as_slice());
         }
     }
@@ -135,7 +135,7 @@ mod test {
 
         let m5x2_sum = m5x2 + m5x2_clone;
 
-        for row in m5x2_sum.rows() {
+        for row in m5x2_sum.as_rowmatrix() {
             println!("{:?}", row.as_slice());
         }
     }
@@ -150,7 +150,7 @@ mod test {
         let mut m3x3 = Matrix::new(vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8])
             .rearrange(3, 3)
             .unwrap();
-        for row in m3x3.rows() {
+        for row in m3x3.as_rowmatrix() {
             println!("{:?}", row.as_slice());
         }
         m3x3.transpose();

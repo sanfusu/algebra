@@ -86,12 +86,12 @@ where
     }
 }
 
-pub struct Cols<'a, T> {
+pub struct ColMatrix<'a, T> {
     pub(crate) matrix: &'a Matrix<T>,
     pub(crate) idx: usize,
 }
 
-impl<'a, T> Iterator for Cols<'a, T> {
+impl<'a, T> Iterator for ColMatrix<'a, T> {
     type Item = Col<'a, T>;
 
     fn next(&mut self) -> Option<Self::Item> {
