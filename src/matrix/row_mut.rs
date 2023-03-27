@@ -21,6 +21,9 @@ impl<'a, T> RowMut<'a, T> {
             Some(&mut self.as_slice()[index])
         }
     }
+    pub fn iter_mut(&mut self) -> IterMut<T> {
+        self.as_slice().iter_mut()
+    }
 }
 
 impl<'a, T> IntoIterator for &'a mut RowMut<'a, T> {
