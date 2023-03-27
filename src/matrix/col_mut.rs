@@ -15,10 +15,10 @@ pub struct RawColMut<'a, T> {
 
 impl<'a, T> RawColMut<'a, T> {
     pub fn flat_idx(&self, idx: usize) -> Option<usize> {
-        if idx > self.matrix.row {
-            None
-        } else {
+        if idx < self.matrix.row {
             Some(idx * self.matrix.col + self.col)
+        } else {
+            None
         }
     }
 }
