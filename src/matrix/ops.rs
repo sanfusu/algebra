@@ -2,7 +2,7 @@ use std::ops::{Add, Mul};
 
 use super::{
     col::{Col, Iter},
-    row::{Row, IntoRowEleIter},
+    row::{IntoRowEleIter, Row},
     Matrix,
 };
 
@@ -40,17 +40,26 @@ where
     }
 }
 impl<T: Copy> Matrix<T> {
-    pub fn transpose(&mut self) {
-        if self.col != self.row {
-            return;
-        }
+    pub fn transpose(mut self) -> Self {
         if self.col == 1 || self.row == 1 {
             (self.col, self.row) = (self.row, self.col);
+            return self;
         }
-        for r in 0..self.row {
-            for j in (r + 1)..self.col {
-                (self[r][j], self[j][r]) = (self[j][r], self[r][j])
+        if self.col == self.row {
+            for r in 0..self.row {
+                for j in (r + 1)..self.col {
+                    (self[r][j], self[j][r]) = (self[j][r].clone(), self[r][j])
+                }
             }
+            return self;
+        } else {
+            let mut new_matrix = self.clone().rearrange(self.col, self.row).unwrap();
+            for r in 0..self.row {
+                for j in 0..self.col {
+                    new_matrix[j][r] = self[r][j];
+                }
+            }
+            return new_matrix;
         }
     }
 }
