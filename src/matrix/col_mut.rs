@@ -1,8 +1,4 @@
-use std::{
-    mem::transmute,
-    ops::{Index, IndexMut},
-    ptr::slice_from_raw_parts_mut,
-};
+use std::ops::{Index, IndexMut};
 
 use crate::vector::ColVec;
 
@@ -20,11 +16,8 @@ impl<'a, T> ColMut<'a, T> {
             col: self.col,
         }
     }
-    pub fn get(&mut self, index: usize) -> Option<&'a mut T> {
-        // SAFETY: 'self >= &'a，且 element 是对 matrix.data 的引用，而非 row 的引用。
-        let mut row = self.matrix.row_mut(index)?;
-        let element = row.get(self.col);
-        unsafe { transmute(element) }
+    pub fn get(&mut self, index: usize) -> Option<&mut T> {
+        self.as_raw().get_mut(index)
     }
     pub fn iter_mut(&mut self) -> IterMut<T> {
         IterMut {
@@ -58,15 +51,9 @@ impl<'a, T: 'a> Iterator for IterMut<'a, T> {
     type Item = &'a mut T;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let flat_idx = self.col.flat_idx(self.idx)?;
+        let result = self.col.get_mut(self.idx)?;
         self.idx += 1;
-        let flat_slice = unsafe {
-            &mut *slice_from_raw_parts_mut(
-                self.col.matrix.data.as_ptr(),
-                self.col.matrix.col * self.col.matrix.row,
-            )
-        };
-        Some(&mut flat_slice[flat_idx])
+        Some(result)
     }
 }
 
