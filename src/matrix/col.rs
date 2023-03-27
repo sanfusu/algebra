@@ -59,13 +59,13 @@ where
 {
     type Item = T;
 
-    type IntoIter = IntoColEleIter<'a, T>;
+    type IntoIter = Iter<'a, T>;
 
     fn into_iter(self) -> Self::IntoIter {
-        IntoColEleIter { col: self, idx: 0 }
+        Iter { col: self, idx: 0 }
     }
 }
-pub struct IntoColEleIter<'a, T>
+pub struct Iter<'a, T>
 where
     T: Clone,
 {
@@ -73,7 +73,7 @@ where
     idx: usize,
 }
 
-impl<'a, T> Iterator for IntoColEleIter<'a, T>
+impl<'a, T> Iterator for Iter<'a, T>
 where
     T: Clone,
 {
@@ -86,17 +86,17 @@ where
     }
 }
 
-pub struct ColMatrix<'a, T> {
-    pub(crate) matrix: &'a Matrix<T>,
-    pub(crate) idx: usize,
-}
+    pub struct ColMatrix<'a, T> {
+        pub(crate) matrix: &'a Matrix<T>,
+        pub(crate) idx: usize,
+    }
 
-impl<'a, T> Iterator for ColMatrix<'a, T> {
-    type Item = Col<'a, T>;
+    impl<'a, T> Iterator for ColMatrix<'a, T> {
+        type Item = Col<'a, T>;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        let result = self.matrix.col(self.idx)?;
-        self.idx += 1;
-        Some(result)
+        fn next(&mut self) -> Option<Self::Item> {
+            let result = self.matrix.col(self.idx)?;
+            self.idx += 1;
+            Some(result)
     }
 }

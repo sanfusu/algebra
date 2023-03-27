@@ -1,7 +1,7 @@
 use std::ops::{Add, Mul};
 
 use super::{
-    col::{Col, IntoColEleIter},
+    col::{Col, Iter},
     row::{Row, IntoRowEleIter},
     Matrix,
 };
@@ -66,7 +66,7 @@ where
 
     fn mul(self, rhs: Col<'a, T>) -> Self::Output {
         let row_ele_iter: IntoRowEleIter<T> = self.into_iter();
-        let other: IntoColEleIter<T> = rhs.into_iter();
+        let other: Iter<T> = rhs.into_iter();
         row_ele_iter.zip(other).fold(T::default(), |sum, (x, y)| {
             let diff = x * y;
             sum + diff
