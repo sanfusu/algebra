@@ -159,9 +159,8 @@ mod test {
     }
     #[test]
     fn matrix_transpose() {
-        let m2x5 = Matrix::new(vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9])
-            .rearrange(2, 5)
-            .unwrap();
+        let matrix = Matrix::new(vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        let m2x5 = matrix.rearrange(2, 5).unwrap();
         for row in m2x5.as_rowmatrix() {
             println!("{:?}", row.as_slice());
         }
