@@ -27,8 +27,11 @@ pub struct Matrix<T> {
     pub col: usize,
     pub row: usize,
 }
+
 impl<T> Matrix<T> {
-    pub(crate) fn as_raw(&mut self) -> RawMatrix<T> {
+    /// 只能在 iter 中使用
+    /// RawMatrix 是对 self 底层数据的引用，但是分离了两者的生命周期。因此是 unsafe 的。
+    pub(crate) unsafe fn as_raw<'a>(&mut self) -> RawMatrix<'a, T> {
         RawMatrix {
             data: unsafe { NonNull::new_unchecked(self.data.as_mut_ptr()) },
             col: self.col,
@@ -182,11 +185,10 @@ mod test {
         println!("{:?}", m3x3.data);
         let mut col = m3x3.col_mut(2).unwrap();
 
-        col.iter_mut().for_each(|ele| {
+        for ele in &mut col {
             *ele *= 2;
-        });
+        }
         col[0] = 1;
-        col[1] = 1;
 
         m3x3.col_mut(0).unwrap()[0] = 1;
         println!("{:?}", m3x3);

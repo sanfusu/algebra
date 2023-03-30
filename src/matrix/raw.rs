@@ -27,7 +27,7 @@ impl<'a, T> RawColMut<'a, T> {
             None
         }
     }
-    pub(crate) fn get_mut(&self, idx: usize) -> Option<&'a mut T> {
+    pub(crate) fn get(&self, idx: usize) -> Option<&'a mut T> {
         let flat_idx = self.flat_idx(idx);
         Some(&mut self.matrix.as_slice()[flat_idx?])
     }

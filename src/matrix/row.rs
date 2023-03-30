@@ -8,11 +8,11 @@ pub struct Row<'a, T> {
     pub(crate) matrix: &'a Matrix<T>,
     pub(crate) row: usize,
 }
-impl<'a: 'b, 'b, T> Row<'a, T> {
-    pub fn as_slice(&'b self) -> &'a [T] {
+impl<'a, T> Row<'a, T> {
+    pub(crate) fn as_slice(&self) -> &'a [T] {
         &self.matrix[self.row]
     }
-    pub fn get(&'b self, index: usize) -> Option<&'a T> {
+    pub fn get(&self, index: usize) -> Option<&'a T> {
         if index >= self.matrix.col {
             None
         } else {
